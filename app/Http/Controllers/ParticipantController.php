@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\Participant;
+use App\Models\Slot;
 use Illuminate\Http\Request;
 
 class ParticipantController extends Controller
@@ -14,7 +16,8 @@ class ParticipantController extends Controller
      */
     public function index()
     {
-        //
+        $participants = Participant::with('slot.device')->get();
+        return view('admin.participants.index',['participants'=>$participants]);
     }
 
     /**
@@ -24,7 +27,8 @@ class ParticipantController extends Controller
      */
     public function create()
     {
-        //
+        $devices = Device::all();
+        return view('admin.participants.create',['devices'=>$devices]);
     }
 
     /**
@@ -44,7 +48,7 @@ class ParticipantController extends Controller
         ]);
 
         Participant::create($request->all());
-        return ['success'=>true];
+        return redirect()->route('admin.participants.index')->with('success','Participant created successfully.');
     }
 
     /**
@@ -55,7 +59,8 @@ class ParticipantController extends Controller
      */
     public function show($id)
     {
-        //
+        $participant = Participant::with('slot.device')->findOrFail($id);
+        return view('admin.participants.show',['participant'=>$participant]);
     }
 
     /**
@@ -66,7 +71,9 @@ class ParticipantController extends Controller
      */
     public function edit($id)
     {
-        //
+        $devices = Device::all();
+        $participant = Participant::findOrFail($id);
+        return view('admin.participants.edit',['participant'=>$participant,'devices'=>$devices]);
     }
 
     /**
@@ -78,7 +85,16 @@ class ParticipantController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name'=>"required|string|min:4",
+            "university_id"=>"required|string",
+            "email"=>"required|email",
+            "phone"=>"required|string",
+        ]);
+
+        $participant = Participant::findOrFail($id);
+        $participant->update($request->all());
+        return redirect()->route('admin.participants.index')->with('success','Participant updated successfully.');
     }
 
     /**
@@ -89,6 +105,8 @@ class ParticipantController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $participant = Participant::findOrFail($id);
+        $participant->delete();
+        return redirect()->route('admin.participants.index')->with('success','Participant deleted successfully.');
     }
 }
