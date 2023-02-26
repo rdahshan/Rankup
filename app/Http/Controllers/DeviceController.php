@@ -15,7 +15,7 @@ class DeviceController extends Controller
     public function index()
     {
         $devices = Device::all();
-        return $devices;
+        return view('admin.devices.index',['devices'=>$devices]);
     }
 
     /**
@@ -25,7 +25,7 @@ class DeviceController extends Controller
      */
     public function create()
     {
-
+        return view('admin.devices.create');
     }
 
     /**
@@ -41,7 +41,7 @@ class DeviceController extends Controller
         ]);
         Device::create($request->all());
 
-        return ['success'=>true];
+        return redirect()->route('admin.devices.index')->with('success','Device created successfully.');
     }
 
     /**
@@ -53,7 +53,7 @@ class DeviceController extends Controller
     public function show($id)
     {
         $device = Device::findOrFail($id);
-        return $device;
+        return view('admin.devices.show',['device'=>$device]);
     }
 
     /**
@@ -64,7 +64,8 @@ class DeviceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $device = Device::findOrFail($id);
+        return view('admin.devices.edit',['device'=>$device]);
     }
 
     /**
@@ -82,7 +83,7 @@ class DeviceController extends Controller
         $device = Device::findOrFail($id);
         $device->update($request->all());
 
-        return ['success'=>true];
+        return redirect()->route('admin.devices.index')->with('success','Device updated successfully');
     }
 
     /**
@@ -95,6 +96,6 @@ class DeviceController extends Controller
     {
         $device = Device::find($id);
         $device->delete();
-        return ['success'=>true];
+        return redirect()->back()->with('success','Device deleted successfully');
     }
 }
